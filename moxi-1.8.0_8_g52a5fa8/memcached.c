@@ -3910,7 +3910,12 @@ int server_socket(int port, enum network_transport transport,
         }
 #endif
 
-        setsockopt(sfd, SOL_SOCKET, SO_REUSEADDR, (void *)&flags, sizeof(flags));
+        error = setsockopt(sfd, SOL_SOCKET, SO_REUSEADDR, (void *)&flags, sizeof(flags));
+        if (error != 0)
+            perror("setsockopt");
+        
+        setsockopt(sfd, SOL_SOCKET, SO_REUSEPORT, (void *)&flags, sizeof(flags));
+
         if (IS_UDP(transport)) {
             maximize_sndbuf(sfd);
         } else {
