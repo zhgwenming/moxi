@@ -1,6 +1,6 @@
 Name:	moxi
 Version: 1.8.0_8_g52a5fa8
-Release:	903.1%{?dist}
+Release:	903.2%{?dist}
 Summary:	a memcached proxy with energy and pep
 Group:		System Environment/Daemons
 License:	BSD
@@ -96,6 +96,8 @@ rm -rf %{buildroot}
 %{_initrddir}/moxi
 
 %changelog
+* Mon Feb 2 2016 Paul Guo <paulguo@gmail.com>
+- renice moxi to a lower value by default.
 * Mon Jan 1 2016 Paul Guo <paulguo@gmail.com>
 - fix an moxi exit issue which occurs during ascii mget when one or more remote cbase node is warming up.
 * Mon Jul 8 2013 Albert Zhang <zhgwenming@gmail.com>
