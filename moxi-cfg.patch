@@ -1,6 +1,5 @@
-diff -uNrp moxi-1.8.0_8_g52a5fa8.orig/scripts/moxi-init.rhat.in moxi-1.8.0_8_g52a5fa8/scripts/moxi-init.rhat.in
---- moxi-1.8.0_8_g52a5fa8.orig/scripts/moxi-init.rhat.in	2012-07-03 12:40:38.708272969 +0800
-+++ moxi-1.8.0_8_g52a5fa8/scripts/moxi-init.rhat.in	2012-07-04 11:14:01.477346789 +0800
+--- moxi-1.8.0_8_g52a5fa8.orig/scripts/moxi-init.rhat.in	2016-02-04 17:34:52.471359607 +0800
++++ moxi-1.8.0_8_g52a5fa8/scripts/moxi-init.rhat.in	2016-02-06 10:52:26.439893238 +0800
 @@ -11,12 +11,25 @@
  USER=nobody
  MAXCONN=1024
@@ -27,7 +26,7 @@ diff -uNrp moxi-1.8.0_8_g52a5fa8.orig/scripts/moxi-init.rhat.in moxi-1.8.0_8_g52
  # Check that networking is up.
  if [ "$NETWORKING" = "no" ]
  then
-@@ -38,7 +51,11 @@ start () {
+@@ -38,10 +51,16 @@ start () {
  	echo -n $"Starting $prog: "
  	# insure that /var/run/moxi has proper permissions
          chown $USER /var/run/moxi
@@ -40,3 +39,8 @@ diff -uNrp moxi-1.8.0_8_g52a5fa8.orig/scripts/moxi-init.rhat.in moxi-1.8.0_8_g52
  	RETVAL=$?
  	echo
  	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/moxi
++	MOXI_PID=`cat /var/run/moxi/moxi.pid`
++	renice -n -5 `ps --no-headers -Lo tid $MOXI_PID` >/dev/null
+ }
+ stop () {
+ 	echo -n $"Stopping $prog: "
