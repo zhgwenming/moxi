@@ -1,13 +1,16 @@
 diff -uNrp moxi-1.8.0_8_g52a5fa8.orig/scripts/moxi-init.rhat.in moxi-1.8.0_8_g52a5fa8/scripts/moxi-init.rhat.in
---- moxi-1.8.0_8_g52a5fa8.orig/scripts/moxi-init.rhat.in	2012-07-03 12:40:38.708272969 +0800
-+++ moxi-1.8.0_8_g52a5fa8/scripts/moxi-init.rhat.in	2012-07-04 11:14:01.477346789 +0800
-@@ -11,12 +11,25 @@
+--- moxi-1.8.0_8_g52a5fa8.orig/scripts/moxi-init.rhat.in	2016-02-06 11:21:18.930843939 +0800
++++ moxi-1.8.0_8_g52a5fa8/scripts/moxi-init.rhat.in	2016-02-14 12:29:56.978614659 +0800
+@@ -11,12 +11,28 @@
  USER=nobody
  MAXCONN=1024
  CPROXY_ARG=/etc/moxi.conf
 +MOXI_LOG=/var/log/moxi.log
  OPTIONS=""
 +MOXI_LISTEN=127.0.0.1
++
++MOXI_PID_FILE=/var/run/moxi/moxi.pid
++MOXI_LOCK_FILE=/var/lock/subsys/moxi
  
  if [ -f /etc/sysconfig/moxi ];then 
  	. /etc/sysconfig/moxi
@@ -27,16 +30,52 @@ diff -uNrp moxi-1.8.0_8_g52a5fa8.orig/scripts/moxi-init.rhat.in moxi-1.8.0_8_g52
  # Check that networking is up.
  if [ "$NETWORKING" = "no" ]
  then
-@@ -38,7 +51,11 @@ start () {
+@@ -36,21 +52,25 @@ prog="moxi"
+ 
+ start () {
  	echo -n $"Starting $prog: "
- 	# insure that /var/run/moxi has proper permissions
-         chown $USER /var/run/moxi
+-	# insure that /var/run/moxi has proper permissions
+-        chown $USER /var/run/moxi
 -	daemon /usr/bin/moxi -d -u $USER -c $MAXCONN -z $CPROXY_ARG -P /var/run/moxi/moxi.pid $OPTIONS
++	# insure that directory of pid file has proper permissions
++        chown $USER `dirname $MOXI_PID_FILE`
 +	# We need "\," to handle the single CBASE_HOST case.
 +	STREAM=`eval echo http://{$CBASE_HOST\,}:8091/pools/default/bucketsStreaming/${CBASE_BUCKET:-default} | sed 's/ /,/g;s#,http://:8091.*$##'`
 +
-+	daemon -5 /usr/bin/moxi -d -u $USER -c $MAXCONN -Z $CPROXY_ARG -P /var/run/moxi/moxi.pid 	\
++	daemon -5 /usr/bin/moxi -d -u $USER -c $MAXCONN -Z $CPROXY_ARG -P $MOXI_PID_FILE 	\
 +		-l "$MOXI_LISTEN" -z $STREAM -O $MOXI_LOG $OPTIONS
  	RETVAL=$?
  	echo
- 	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/moxi
+-	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/moxi
++	[ $RETVAL -eq 0 ] && touch $MOXI_LOCK_FILE
+ }
+ stop () {
+ 	echo -n $"Stopping $prog: "
+-	killproc moxi
++	killproc -p $MOXI_PID_FILE moxi
+ 	RETVAL=$?
+ 	echo
+ 	if [ $RETVAL -eq 0 ] ; then
+-	    rm -f /var/lock/subsys/moxi
+-	    rm -f /var/run/moxi.pid
++	    rm -f $MOXI_LOCK_FILE
++	    rm -f $MOXI_PID_FILE
+ 	fi
+ }
+ 
+@@ -69,13 +89,13 @@ case "$1" in
+ 	stop
+ 	;;
+   status)
+-	status moxi
++	status -p $MOXI_PID_FILE moxi
+ 	;;
+   restart|reload)
+ 	restart
+ 	;;
+   condrestart)
+-	[ -f /var/lock/subsys/moxi ] && restart || :
++	[ -f $MOXI_LOCK_FILE ] && restart || :
+ 	;;
+   *)
+ 	echo $"Usage: $0 {start|stop|status|restart|reload|condrestart}"
