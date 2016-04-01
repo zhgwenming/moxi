@@ -1,6 +1,6 @@
 diff -uNrp moxi-1.8.0_8_g52a5fa8.orig/scripts/moxi-init.rhat.in moxi-1.8.0_8_g52a5fa8/scripts/moxi-init.rhat.in
---- moxi-1.8.0_8_g52a5fa8.orig/scripts/moxi-init.rhat.in	2016-02-06 11:21:18.930843939 +0800
-+++ moxi-1.8.0_8_g52a5fa8/scripts/moxi-init.rhat.in	2016-02-14 12:29:56.978614659 +0800
+--- moxi-1.8.0_8_g52a5fa8.orig/scripts/moxi-init.rhat.in	2016-04-01 14:06:46.149986140 +0800
++++ moxi-1.8.0_8_g52a5fa8/scripts/moxi-init.rhat.in	2016-04-01 14:22:01.736352851 +0800
 @@ -11,12 +11,28 @@
  USER=nobody
  MAXCONN=1024
@@ -63,7 +63,15 @@ diff -uNrp moxi-1.8.0_8_g52a5fa8.orig/scripts/moxi-init.rhat.in moxi-1.8.0_8_g52
  	fi
  }
  
-@@ -69,13 +89,13 @@ case "$1" in
+@@ -63,19 +83,21 @@ restart () {
+ # See how we were called.
+ case "$1" in
+   start)
++	status -p $MOXI_PID_FILE moxi 1>/dev/null 2>&1 && exit 0
+ 	start
+ 	;;
+   stop)
++	status -p $MOXI_PID_FILE moxi 1>/dev/null 2>&1 || exit 0
  	stop
  	;;
    status)
