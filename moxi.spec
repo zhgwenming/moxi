@@ -1,6 +1,6 @@
 Name:	moxi
 Version: 1.8.0_8_g52a5fa8
-Release:	903.3%{?dist}
+Release:	903.4%{?dist}
 Summary:	a memcached proxy with energy and pep
 Group:		System Environment/Daemons
 License:	BSD
@@ -96,8 +96,10 @@ rm -rf %{buildroot}
 %{_initrddir}/moxi
 
 %changelog
+* Mon Apr 1 2016 Paul Guo <paulguo@gmail.com>
+- check service status before starting/stopping the service.
 * Mon Feb 14 2016 Paul Guo <paulguo@gmail.com>
-- fix bugs that pid file is not properly used, make the service script easier to modify-and-then-run with multiple instances.
+- fix bugs: pid file is not properly used; make the service script easier to modify-and-then-run with multiple instances.
 * Mon Feb 6 2016 Paul Guo <paulguo@gmail.com>
 - set default nice value of moxi to -5.
 * Mon Jan 1 2016 Paul Guo <paulguo@gmail.com>
